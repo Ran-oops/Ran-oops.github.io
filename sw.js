@@ -28,6 +28,8 @@ var precacheUrls = [];
 
   precacheUrls.push('/2020/01/11/hello-world/');
 
+  precacheUrls.push('/2020/01/13/third/');
+
 toolbox.precache(precacheUrls);
 toolbox.options = {"networkTimeoutSeconds":5};
 

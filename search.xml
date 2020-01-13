@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>third</title>
+    <url>/2020/01/13/third/</url>
+    <content><![CDATA[<p>下载安装 Editor.md，放在public/static目录下</p>
+<p>关于emoji表情加载不出来，下载emoji插件，放在plugins/emoji-dialog目录下</p>
+<p>修改文件中emoji的路径</p>
+<p>   editormd.emoji   = {        // path  : “<a href="http://www.emoji-cheat-sheet.com/graphics/emojis/&quot;" target="_blank" rel="noopener">http://www.emoji-cheat-sheet.com/graphics/emojis/&quot;</a>,        path  : “static/plug-ins/plugins/emoji-dialog/emoji/“,        ext   : “.png”    };</p>
+<p>index.html</p>
+<!doctype html><html> <head><link rel=manifest href=/pwa.webmanifest>    <meta charset="utf-8">    <title>EditorMD</title>    <!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" rel="stylesheet">-->    <link rel="stylesheet" type="text/css" href="__STATIC__/plug-ins/lib/codemirror/codemirror.min.css" />    <!--<script type="text/javascript" src="plug-ins/JQuery/jquery-3.3.1.min.js"></script>-->    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>    <script type="text/javascript" src="__STATIC__/plug-ins/editormd.js"></script>    <link rel="stylesheet" type="text/css" href="__STATIC__/plug-ins/css/editormd.css" />    <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>--><link rel="alternate" href="/atom.xml" title="It's never too late to do the right things!" type="application/atom+xml">
+</head> <body><div class="editormd" id="test-editormd">    <textarea class="editormd-markdown-textarea" name="test-editormd-markdown-doc"></textarea>    <!-- 第二个隐藏文本域，用来构造生成的HTML代码，方便表单POST提交，这里的name可以任意取，后台接受时以这个name键为准 -->    <textarea class="editormd-html-textarea" name="text"></textarea></div><script type="text/javascript">    $(function() {        editormd("test-editormd", {            //开启emoji（默认关闭）            emoji : true,            width   : "90%",            height  : 640,            syncScrolling : "single",            //lib目录的路径            path    : "__STATIC__/plug-ins/lib/",            //这个配置在simple.html中并没有，但是为了能够提交表单，使用这个配置可以让构造出来的HTML代码直接在第二个隐藏的textarea域中，方便post提交表单。            saveHTMLToTextarea : true        });    });</script><script>if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js?t=1578903878019')
+    .then(function () {console.log('ServiceWorker Register Successfully.')})
+    .catch(function (e) {console.error(e)});
+}
+</script></body></html>
+
+
+<p>转载；<br>原文链接：<a href="https://blog.csdn.net/zch3210/article/details/86538456" target="_blank" rel="noopener">https://blog.csdn.net/zch3210/article/details/86538456</a></p>
+]]></content>
+  </entry>
+  <entry>
     <title>First-Ran</title>
     <url>/2020/01/11/First-Ran/</url>
     <content><![CDATA[<h1 id="Hello-World"><a href="#Hello-World" class="headerlink" title="Hello World"></a>Hello World</h1><p>Here is Ran.</p>
