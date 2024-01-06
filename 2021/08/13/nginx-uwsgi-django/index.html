@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ran-oops.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="本篇文章介绍了云服务器centos下nginx+uWSGI+Django+域名部署, 请打开相应端口和购买域名">
+<meta property="og:type" content="article">
+<meta property="og:title" content="云服务器centos下nginx+uWSGI+Django+域名部署">
+<meta property="og:url" content="https://ran-oops.github.io/2021/08/13/nginx-uwsgi-django/index.html">
+<meta property="og:site_name" content="啊了个呜">
+<meta property="og:description" content="本篇文章介绍了云服务器centos下nginx+uWSGI+Django+域名部署, 请打开相应端口和购买域名">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ran-oops.github.io/nginx-uwsgi-django/image-20210810170442006.png">
+<meta property="og:image" content="https://ran-oops.github.io/2021/08/13/nginx-uwsgi-django/nginx-uwsgi-django/image-20210810172917541.png">
+<meta property="og:image" content="https://ran-oops.github.io/2021/08/13/nginx-uwsgi-django/nginx-uwsgi-django/image-20210810174540439.png">
+<meta property="article:published_time" content="2021-08-13T05:49:34.000Z">
+<meta property="article:modified_time" content="2024-01-06T16:27:20.856Z">
+<meta property="article:author" content="Ran-oops">
+<meta property="article:tag" content="deploy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ran-oops.github.io/nginx-uwsgi-django/image-20210810170442006.png">
+
+
+<link rel="canonical" href="https://ran-oops.github.io/2021/08/13/nginx-uwsgi-django/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://ran-oops.github.io/2021/08/13/nginx-uwsgi-django/","path":"2021/08/13/nginx-uwsgi-django/","title":"云服务器centos下nginx+uWSGI+Django+域名部署"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>云服务器centos下nginx+uWSGI+Django+域名部署 | 啊了个呜</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">啊了个呜</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ran-oops"
+      src="/images/android-chrome-192x192.png">
+  <p class="site-author-name" itemprop="name">Ran-oops</p>
+  <div class="site-description" itemprop="description">道阻且艰, 行则将至</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdnjs.cloudflare.com/ajax/libs/creativecommons-vocabulary/2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://ran-oops.github.io/2021/08/13/nginx-uwsgi-django/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/android-chrome-192x192.png">
+      <meta itemprop="name" content="Ran-oops">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="啊了个呜">
+      <meta itemprop="description" content="道阻且艰, 行则将至">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="云服务器centos下nginx+uWSGI+Django+域名部署 | 啊了个呜">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          云服务器centos下nginx+uWSGI+Django+域名部署
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-08-13 13:49:34" itemprop="dateCreated datePublished" datetime="2021-08-13T13:49:34+08:00">2021-08-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-01-07 00:27:20" itemprop="dateModified" datetime="2024-01-07T00:27:20+08:00">2024-01-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/deploy/" itemprop="url" rel="index"><span itemprop="name">deploy</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>本篇文章介绍了云服务器centos下nginx+uWSGI+Django+域名部署, 请打开相应端口和购买域名</p>
+<span id="more"></span>
+
+<ol>
+<li><p>安装nginx</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yum install nginx</span><br><span class="line">vi /etc/nginx/conf.d/builddemo_nginx.conf</span><br></pre></td></tr></table></figure>
+
+<p>builddemo_nginx.conf文件名字是自定义的, 在此文件中输入以下内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    server_name 域名或者主机外网ip;</span><br><span class="line">    listen 17879;</span><br><span class="line">    location / &#123;</span><br><span class="line">        include uwsgi_params;</span><br><span class="line">        uwsgi_pass 127.0.0.1:17878;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注: </p>
+<p>​	(1) 如果server_name 域名;的话,需要保证服务器与服务器已绑定, 绑定方法请参考:[(1条消息) 如何绑定腾讯云域名到云服务器ip？_colorfulyan的博客-CSDN博客](<a target="_blank" rel="noopener" href="https://blog.csdn.net/colorfulyan/article/details/108952573#:~:text=%E7%99%BB%E9%99%86">https://blog.csdn.net/colorfulyan/article/details/108952573#:~:text=登陆</a> 腾讯云 ，鼠标移至” 云 产品”，下滑选择” 域名 管理” ,如何 绑定ip ） 进入控制台-&gt;总览-&gt; 云 解析 2) 这里需要做进一步的设置，比如，在更多选项卡中，开启CNAME加速，)</p>
+<p>​	(2)uwsgi_pass 是nginx与uWSGI服务器之间通信, 一般nginx是和uWSGI服务器是在同一台主机上面,因此直接使用127.0.0.1即可, 端口自己定义</p>
+<p>​    (3) listen 17879; 这里的端口号也是自己定义的,这是用于客户端与nginx之间的通信. 比如在浏览器输入: <a target="_blank" rel="noopener" href="http://sunshine.site:17879/">http://sunshine.site:17879/</a></p>
+</li>
+<li><p>安装uWSGI—web服务器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pip  install uwsgi   </span><br><span class="line">systemctl stop firewalld   //关掉防火墙</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>检测uwsgi的是否可用</p>
+<p>在任意一个文件夹<code> vi test.py</code>,输入以下内容:</p>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">def application(env, start_response):</span><br><span class="line">    start_response(&#x27;200 OK&#x27;, [(&#x27;Content-Type&#x27;,&#x27;text/html&#x27;)])</span><br><span class="line">    tt = &quot;hello world&quot;</span><br><span class="line">    return tt.encode(&#x27;utf-8&#x27;)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 执行命令</span><br><span class="line">[root@infinity ~]# uwsgi --http :18001 --wsgi-file test.py</span><br></pre></td></tr></table></figure>
+
+
+
+<p>在浏览器输入ip地址:端口号</p>
+<p><img src="/./nginx-uwsgi-django/image-20210810170442006.png" alt="image-20210810170442006"></p>
+<p>这就确保了uWSGI服务器正常</p>
+</li>
+<li><p>创建django项目</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">django-admin startproject builddemo</span><br><span class="line">cd builddemo</span><br><span class="line">python manage.py startapp firstapp</span><br><span class="line">mkdir uwsgi_conf</span><br><span class="line">vi uwsgi_params</span><br></pre></td></tr></table></figure>
+
+<p>在<code>uwsgi_params</code>里面输入以下内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">uwsgi_param  QUERY_STRING       $query_string;</span><br><span class="line">uwsgi_param  REQUEST_METHOD     $request_method;</span><br><span class="line">uwsgi_param  CONTENT_TYPE       $content_type;</span><br><span class="line">uwsgi_param  CONTENT_LENGTH     $content_length;</span><br><span class="line"></span><br><span class="line">uwsgi_param  REQUEST_URI        $request_uri;</span><br><span class="line">uwsgi_param  PATH_INFO          $document_uri;</span><br><span class="line">uwsgi_param  DOCUMENT_ROOT      $document_root;</span><br><span class="line">uwsgi_param  SERVER_PROTOCOL    $server_protocol;</span><br><span class="line">uwsgi_param  REQUEST_SCHEME     $scheme;</span><br><span class="line">uwsgi_param  HTTPS              $https if_not_empty;</span><br><span class="line"></span><br><span class="line">uwsgi_param  REMOTE_ADDR        $remote_addr;</span><br><span class="line">uwsgi_param  REMOTE_PORT        $remote_port;</span><br><span class="line">uwsgi_param  SERVER_PORT        $server_port;</span><br><span class="line">uwsgi_param  SERVER_NAME        $server_name;</span><br></pre></td></tr></table></figure>
+
+<p>现在的目录结构是介样的:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">[root@infinity builddemo]# tree</span><br><span class="line">.</span><br><span class="line">├── builddemo</span><br><span class="line">│   ├── asgi.py</span><br><span class="line">│   ├── __init__.py</span><br><span class="line">│   ├── __pycache__</span><br><span class="line">│   │   ├── __init__.cpython-36.pyc</span><br><span class="line">│   │   ├── settings.cpython-36.pyc</span><br><span class="line">│   │   ├── urls.cpython-36.pyc</span><br><span class="line">│   │   └── wsgi.cpython-36.pyc</span><br><span class="line">│   ├── settings.py</span><br><span class="line">│   ├── urls.py</span><br><span class="line">│   └── wsgi.py</span><br><span class="line">├── db.sqlite3</span><br><span class="line">├── firstapp</span><br><span class="line">│   ├── admin.py</span><br><span class="line">│   ├── apps.py</span><br><span class="line">│   ├── __init__.py</span><br><span class="line">│   ├── migrations</span><br><span class="line">│   │   └── __init__.py</span><br><span class="line">│   ├── models.py</span><br><span class="line">│   ├── tests.py</span><br><span class="line">│   └── views.py</span><br><span class="line">├── manage.py</span><br><span class="line">├── media</span><br><span class="line">├── static</span><br><span class="line">├── uwsgi_conf</span><br><span class="line">└── uwsgi_params</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>在builddemo&#x2F;settings.py 里面的<code>ALLOWED_HOSTS = []</code>改成<code>ALLOWED_HOSTS = [&#39;*&#39;]</code></p>
+<p>在根目录输入<code>python manage.py runserver</code> 正常就表明项目创建成功</p>
+<p>也可以通过uwsgi来启动项目(注:此时仅仅只是可用uwsgi命令来启动, 和nginx还没关联): </p>
+<p><code>[root@infinity builddemo]# uwsgi --http :19091 --module builddemo.wsgi</code></p>
+<p>在浏览器输入: 外网ip:端口号即可访问</p>
+<img src="./nginx-uwsgi-django/image-20210810172917541.png" alt="image-20210810172917541" style="zoom: 50%;" />
+</li>
+<li><p>通过uwsgi.ini文件将nginx和uWSGI和django项目关联起来</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd uwsgi_conf</span><br><span class="line">vi uwsgi.ini</span><br></pre></td></tr></table></figure>
+
+<p>在uwsgi.ini里面输入以下配置信息:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"># uwsig使用配置文件启动</span><br><span class="line">[uwsgi]</span><br><span class="line">socket = 127.0.0.1:17878  # 注意要和/etc/nginx/conf.d/builddemo_nginx.conf里面uwsgi_pass的端口保持一致</span><br><span class="line"># 项目所在的根目录</span><br><span class="line">chdir=/root/builddemo/</span><br><span class="line"># 指定项目的application,区别于启动命令--wsgi-filemysite/wsgi.py</span><br><span class="line">module=builddemo.wsgi:application</span><br><span class="line">#the local unix socket file than commnuincate to Nginx</span><br><span class="line"># 指定sock的文件路径，这个sock文件会在nginx的uwsgi_pass配置，用来nginx与uwsgi通信</span><br><span class="line"># 支持ip+port模式以及socket file模式</span><br><span class="line"># 进程个数, 一般设置为cpu个数的两倍</span><br><span class="line">processes = 8</span><br><span class="line"># 每个进程worker数</span><br><span class="line">workers=5</span><br><span class="line">py-autoreload=1                              # py文件修改，自动加载</span><br><span class="line"></span><br><span class="line"># 指定多个静态文件：static目录和media目录,也可以不用指定该静态文件，在nginx中配置静态文件目录</span><br><span class="line"># uwsgi有自己的配置语法，详细可参考官网，无需写绝对路径，可以用循环、判断等高级配置语法</span><br><span class="line">for =static media</span><br><span class="line">static-map=/static=%(chdir)/%(_)</span><br><span class="line"></span><br><span class="line"># 启动uwsgi的用户名和用户组</span><br><span class="line">uid=root</span><br><span class="line">gid=root</span><br><span class="line"></span><br><span class="line"># 启用主进程</span><br><span class="line">master=true</span><br><span class="line"># 自动移除unix Socket和pid文件当服务停止的时候</span><br><span class="line">vacuum=true</span><br><span class="line"></span><br><span class="line"># 序列化接受的内容，如果可能的话</span><br><span class="line">thunder-lock=true</span><br><span class="line"># 启用线程</span><br><span class="line">enable-threads=true</span><br><span class="line"># 设置一个超时，用于中断那些超过服务器请求上限的额外请求</span><br><span class="line">harakiri=30</span><br><span class="line"># 设置缓冲</span><br><span class="line">post-buffering=4096</span><br><span class="line"></span><br><span class="line"># 设置日志目录</span><br><span class="line">daemonize=%(chdir)/uwsgi_conf/uwsgi.log</span><br><span class="line"># uWSGI进程号存放</span><br><span class="line">pidfile=%(chdir)/uwsgi_conf/uwsgi.pid</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>uwsgi.ini文件中记录了<strong>要部署的项目的目录</strong>,以及<strong>nginx的端口</strong> 以及其他配置信息, 实现了将nginx和uWSGI和django项目关联起来</p>
+</li>
+<li><p>启动uWSGI和nginx</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@infinity builddemo]# uwsgi --ini uwsgi_conf/uwsgi.ini</span><br><span class="line">[root@infinity builddemo]# systemctl start nginx</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>这样整个项目就部署成功了,在浏览器输入: ip:端口 或者 域名:端口  就可以正常访问了:</p>
+<img src="./nginx-uwsgi-django/image-20210810174540439.png" alt="image-20210810174540439" style="zoom:50%;" />
+
+<p>完结撒花!!!</p>
+<p>参考文章: <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/49200125">centos7下部署Django（nginx+uwsgi+django+python3) - 知乎 (zhihu.com)</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Ran-oops
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="https://ran-oops.github.io/2021/08/13/nginx-uwsgi-django/" title="云服务器centos下nginx+uWSGI+Django+域名部署">https://ran-oops.github.io/2021/08/13/nginx-uwsgi-django/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/deploy/" rel="tag"># deploy</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/08/08/second-test/" rel="prev" title="hexo部署步骤">
+                  <i class="fa fa-angle-left"></i> hexo部署步骤
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ran-oops</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
